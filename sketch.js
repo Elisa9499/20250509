@@ -9,6 +9,8 @@ let circleSize = 100; // 圓的寬高
 let hand = { keypoints: [] }; // 單手的 keypoints
 let isDragging = false; // 是否正在拖動圓
 let previousX, previousY; // 圓的前一個位置
+let isThumbDragging = false; // 是否正在用大拇指拖動圓
+let thumbPreviousX, thumbPreviousY; // 圓的前一個位置（大拇指）
 
 function preload() {
   // Initialize HandPose model with flipped video input
@@ -29,6 +31,8 @@ function setup() {
   circleY = height / 2; // 圓的初始 Y 座標
   previousX = circleX;
   previousY = circleY;
+  thumbPreviousX = circleX;
+  thumbPreviousY = circleY;
 
   video = createCapture(VIDEO, { flipped: true });
   video.size(640, 480); // 設定影像大小與畫布一致
@@ -105,6 +109,23 @@ function checkPinchTouch(hand) {
   }
 }
 
+function checkThumbTouch(hand) {
+  // 檢查大拇指 (keypoints[4]) 是否碰觸圓
+  let thumbX = hand.keypoints[4].x;
+  let thumbY = hand.keypoints[4].y;
+
+  let distanceToCircleThumb = dist(thumbX, thumbY, circleX, circleY);
+
+  if (distanceToCircleThumb < circleSize / 2) {
+    // 如果大拇指碰觸圓，讓圓跟隨大拇指移動
+    circleX = thumbX;
+    circleY = thumbY;
+    isThumbDragging = true; // 開始畫綠色軌跡
+  } else {
+    isThumbDragging = false; // 停止畫綠色軌跡
+  }
+}
+
 function draw() {
   background(255);
   image(video, 0, 0, 640, 480); // 繪製影像，大小與畫布一致
@@ -117,16 +138,26 @@ function draw() {
   // 繪製手的 keypoints 和連線
   drawHand(hand);
 
-  // 檢查大拇指與食指是否同時碰觸圓
-  checkPinchTouch(hand);
+  // 檢查大拇指與食指是否碰觸圓
+  checkPinchTouch(hand); // 食指與大拇指夾住圓
+  checkThumbTouch(hand); // 大拇指單獨移動圓
 
-  // 如果正在夾住圓，畫出軌跡
+  // 如果正在用食指拖動圓，畫出紅色軌跡
   if (isDragging) {
     stroke(255, 0, 0); // 紅色線條
     strokeWeight(2);
     line(previousX, previousY, circleX, circleY); // 畫出圓心的移動軌跡
     previousX = circleX;
     previousY = circleY;
+  }
+
+  // 如果正在用大拇指拖動圓，畫出綠色軌跡
+  if (isThumbDragging) {
+    stroke(0, 255, 0); // 綠色線條
+    strokeWeight(2);
+    line(thumbPreviousX, thumbPreviousY, circleX, circleY); // 畫出圓心的移動軌跡
+    thumbPreviousX = circleX;
+    thumbPreviousY = circleY;
   }
 
   // 確保至少檢測到一隻手
