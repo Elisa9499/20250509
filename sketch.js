@@ -103,9 +103,9 @@ function checkPinchTouch(hand) {
     // 如果大拇指與食指同時碰觸圓，讓圓跟隨兩者的中點移動
     circleX = (fingerX + thumbX) / 2;
     circleY = (fingerY + thumbY) / 2;
-    isDragging = true; // 開始畫軌跡
+    isDragging = true; // 開始畫紅色軌跡
   } else {
-    isDragging = false; // 停止畫軌跡
+    isDragging = false; // 停止畫紅色軌跡
   }
 }
 
@@ -138,26 +138,16 @@ function draw() {
   // 繪製手的 keypoints 和連線
   drawHand(hand);
 
-  // 檢查大拇指與食指是否碰觸圓
-  checkPinchTouch(hand); // 食指與大拇指夾住圓
-  checkThumbTouch(hand); // 大拇指單獨移動圓
+  // 檢查大拇指與食指是否同時碰觸圓
+  checkPinchTouch(hand);
 
-  // 如果正在用食指拖動圓，畫出紅色軌跡
+  // 如果正在用大拇指和食指夾住圓，畫出紅色軌跡
   if (isDragging) {
     stroke(255, 0, 0); // 紅色線條
     strokeWeight(2);
     line(previousX, previousY, circleX, circleY); // 畫出圓心的移動軌跡
     previousX = circleX;
     previousY = circleY;
-  }
-
-  // 如果正在用大拇指拖動圓，畫出綠色軌跡
-  if (isThumbDragging) {
-    stroke(0, 255, 0); // 綠色線條
-    strokeWeight(2);
-    line(thumbPreviousX, thumbPreviousY, circleX, circleY); // 畫出圓心的移動軌跡
-    thumbPreviousX = circleX;
-    thumbPreviousY = circleY;
   }
 
   // 確保至少檢測到一隻手
