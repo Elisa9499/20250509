@@ -4,6 +4,10 @@
 let video;
 let handPose;
 let hands = [];
+let circleX, circleY; // 圓的初始位置
+let circleSize = 100; // 圓的寬高
+let leftHand = { keypoints: [] }; // 左手的 keypoints
+let rightHand = { keypoints: [] }; // 右手的 keypoints
 
 function preload() {
   // Initialize HandPose model with flipped video input
@@ -19,43 +23,78 @@ function gotHands(results) {
 }
 
 function setup() {
-  createCanvas(640, 480);
+  createCanvas(windowWidth, windowHeight);
+  circleX = width / 2; // 圓的初始 X 座標
+  circleY = height / 2; // 圓的初始 Y 座標
+
   video = createCapture(VIDEO, { flipped: true });
   video.hide();
 
   // Start detecting hands
   handPose.detectStart(video, gotHands);
+
+  // 模擬 keypoints 資料（測試用）
+  for (let i = 0; i < 21; i++) {
+    leftHand.keypoints.push({ x: random(width), y: random(height) });
+    rightHand.keypoints.push({ x: random(width), y: random(height) });
+  }
 }
 
 function drawHand(hand) {
-  // Draw lines for keypoints 0 to 4
+  // 繪製手的 keypoints 和連線
+  stroke(0);
+  for (let i = 0; i < hand.keypoints.length; i++) {
+    fill(0, 0, 255);
+    ellipse(hand.keypoints[i].x, hand.keypoints[i].y, 10); // 繪製 keypoints 圓點
+  }
+
+  // 繪製手指的線條
   for (let i = 0; i < 4; i++) {
     line(hand.keypoints[i].x, hand.keypoints[i].y, hand.keypoints[i + 1].x, hand.keypoints[i + 1].y);
   }
-
-  // Draw lines for keypoints 5 to 8
   for (let i = 5; i < 8; i++) {
     line(hand.keypoints[i].x, hand.keypoints[i].y, hand.keypoints[i + 1].x, hand.keypoints[i + 1].y);
   }
-
-  // Draw lines for keypoints 9 to 12
   for (let i = 9; i < 12; i++) {
     line(hand.keypoints[i].x, hand.keypoints[i].y, hand.keypoints[i + 1].x, hand.keypoints[i + 1].y);
   }
-
-  // Draw lines for keypoints 13 to 16
   for (let i = 13; i < 16; i++) {
     line(hand.keypoints[i].x, hand.keypoints[i].y, hand.keypoints[i + 1].x, hand.keypoints[i + 1].y);
   }
-
-  // Draw lines for keypoints 17 to 20
   for (let i = 17; i < 20; i++) {
     line(hand.keypoints[i].x, hand.keypoints[i].y, hand.keypoints[i + 1].x, hand.keypoints[i + 1].y);
   }
 }
 
+function checkFingerTouch(hand) {
+  // 檢查食指 (keypoints[8]) 是否碰觸圓
+  let fingerX = hand.keypoints[8].x;
+  let fingerY = hand.keypoints[8].y;
+
+  let distanceToCircle = dist(fingerX, fingerY, circleX, circleY);
+  if (distanceToCircle < circleSize / 2) {
+    // 如果碰觸，讓圓跟隨食指移動
+    circleX = fingerX;
+    circleY = fingerY;
+  }
+}
+
 function draw() {
+  background(255);
   image(video, 0, 0);
+
+  // 繪製圓
+  fill(200, 0, 0);
+  noStroke();
+  ellipse(circleX, circleY, circleSize);
+
+  // 繪製左右手的 keypoints 和連線
+  drawHand(leftHand);
+  drawHand(rightHand);
+
+  // 檢查左右手的食指是否碰觸圓
+  checkFingerTouch(leftHand);
+  checkFingerTouch(rightHand);
 
   // Ensure at least one hand is detected
   if (hands.length > 0) {
