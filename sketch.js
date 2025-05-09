@@ -22,7 +22,7 @@ function gotHands(results) {
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(640, 480);
   circleX = width / 2; // 圓的初始 X 座標
   circleY = height / 2; // 圓的初始 Y 座標
 
