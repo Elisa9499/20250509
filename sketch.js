@@ -27,6 +27,33 @@ function setup() {
   handPose.detectStart(video, gotHands);
 }
 
+function drawHand(hand) {
+  // Draw lines for keypoints 0 to 4
+  for (let i = 0; i < 4; i++) {
+    line(hand.keypoints[i].x, hand.keypoints[i].y, hand.keypoints[i + 1].x, hand.keypoints[i + 1].y);
+  }
+
+  // Draw lines for keypoints 5 to 8
+  for (let i = 5; i < 8; i++) {
+    line(hand.keypoints[i].x, hand.keypoints[i].y, hand.keypoints[i + 1].x, hand.keypoints[i + 1].y);
+  }
+
+  // Draw lines for keypoints 9 to 12
+  for (let i = 9; i < 12; i++) {
+    line(hand.keypoints[i].x, hand.keypoints[i].y, hand.keypoints[i + 1].x, hand.keypoints[i + 1].y);
+  }
+
+  // Draw lines for keypoints 13 to 16
+  for (let i = 13; i < 16; i++) {
+    line(hand.keypoints[i].x, hand.keypoints[i].y, hand.keypoints[i + 1].x, hand.keypoints[i + 1].y);
+  }
+
+  // Draw lines for keypoints 17 to 20
+  for (let i = 17; i < 20; i++) {
+    line(hand.keypoints[i].x, hand.keypoints[i].y, hand.keypoints[i + 1].x, hand.keypoints[i + 1].y);
+  }
+}
+
 function draw() {
   image(video, 0, 0);
 
@@ -34,6 +61,9 @@ function draw() {
   if (hands.length > 0) {
     for (let hand of hands) {
       if (hand.confidence > 0.1) {
+        // Draw hand connections
+        drawHand(hand);
+
         // Loop through keypoints and draw circles
         for (let i = 0; i < hand.keypoints.length; i++) {
           let keypoint = hand.keypoints[i];
@@ -52,3 +82,4 @@ function draw() {
     }
   }
 }
+
